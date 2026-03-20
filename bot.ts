@@ -10,7 +10,7 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN as string
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY as string
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
-const OPENAI_MODEL = 'gpt-4o-mini'
+const OPENAI_MODEL = 'gpt-4.1-mini'
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true })
 
