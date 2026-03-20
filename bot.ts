@@ -37,12 +37,7 @@ function parseNewFormat(message: string): { tourName: string; name: string; clie
 }
 
 function tourFileNameFromTour(tourName: string): string {
-  let mapped = tourName
-    .toLocaleLowerCase()
-    .replace(/[''"]/g, '')
-    .replace(/[\s\-–]+/g, '-')
-    .replace(/[^a-zа-яєії\-+]+/gi, '')
-  return `${mapped}.txt`
+  return `${tourName}.txt`
 }
 
 function detectFormat(message: string): 'numbered' | 'bullets' | 'freeform' {
@@ -72,7 +67,7 @@ async function assembleMessages(name: string, tourName: string, clientMessage: s
   let tourInfo = ''
   if (tourName) {
     const tourFile = path.join(toursDir, tourFileNameFromTour(tourName))
-    console.log('Шукаю файл туру:', tourFileNameFromTour('Вікенд у Будапешті + Відень'))
+    console.log('Шукаю файл туру:', tourFile)
     tourInfo = await safeRead(tourFile)
   }
 
