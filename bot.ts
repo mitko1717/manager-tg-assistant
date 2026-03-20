@@ -1,21 +1,13 @@
-import TelegramBot from 'node-telegram-bot-api'
-import dotenv from 'dotenv'
 import axios from 'axios'
 import { readFile } from 'fs/promises'
 import * as path from 'path'
+import { codeText, escapeHtml } from './tg.utils'
+import './commands'
+import { OPENAI_API_KEY, OPENAI_API_URL, OPENAI_MODEL } from './constants'
+import { bot } from './bot-instance'
 
-dotenv.config()
-
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN as string
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY as string
-
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
-const OPENAI_MODEL = 'gpt-4.1-mini'
-
-const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true })
-
-const contextDir = path.join(__dirname, 'context')
-const toursDir = path.join(contextDir, 'tours')
+export const contextDir = path.join(__dirname, 'context')
+export const toursDir = path.join(contextDir, 'tours')
 
 async function safeRead(filePath: string, defaultValue: string = ''): Promise<string> {
   try {
@@ -55,14 +47,14 @@ function countItems(message: string): number {
 }
 
 async function assembleMessages(name: string, tourName: string, clientMessage: string): Promise<{ role: string; content: string }[]> {
-    const [tone, examples, company, faq, dont, rules] = await Promise.all([
+  const [tone, examples, company, faq, dont, rules] = await Promise.all([
     safeRead(path.join(contextDir, 'tone.md')),
     safeRead(path.join(contextDir, 'examples.md')),
     safeRead(path.join(contextDir, 'eurotrips.txt')),
     safeRead(path.join(contextDir, 'faq.md')),
     safeRead(path.join(contextDir, 'dont.md')),
     safeRead(path.join(contextDir, 'rules.md')),
-    ])
+  ])
 
   let tourInfo = ''
   if (tourName) {
@@ -143,6 +135,7 @@ bot.on('message', async (msg) => {
   try {
     const text = msg.text || ''
     const chatId = msg.chat.id
+    if (text.startsWith('/')) return
 
     if (text === '/start') {
       bot.sendMessage(chatId, 'Привіт! Надішли запит у форматі:\n\nНАЗВА_ТУРУ: Назва туру; ІМʼЯ: Імʼя; Питання клієнта')
@@ -164,8 +157,7 @@ bot.on('message', async (msg) => {
 
     // Видаляємо "⏳" і надсилаємо відповідь
     await bot.deleteMessage(chatId, thinkingMsg.message_id)
-    bot.sendMessage(chatId, reply)
-
+    bot.sendMessage(chatId, codeText(escapeHtml(reply)), { parse_mode: 'HTML' })
   } catch (err: any) {
     bot.sendMessage(msg.chat.id, '❌ Вибачте, сталася помилка!')
     console.error(err?.response?.data || err)
