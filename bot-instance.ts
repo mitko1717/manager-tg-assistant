@@ -10,5 +10,5 @@ export const toursDir = path.join(contextDir, 'tours')
 bot.setMyCommands([
   { command: 'start', description: '👋 Як користуватись ботом' },
   { command: 'addtour', description: '➕ Додати тур — /addtour Назва https://...' },
-  { command: 'tours', description: '📂 Список збережених турів' },
+  { command: 'tours', description: '📂 Список турів + шаблони для копіювання' },
 ])
